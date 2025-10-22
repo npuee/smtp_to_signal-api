@@ -1,0 +1,14 @@
+{
+        "senders":[
+                "fake@email.net",
+                "cctv@fake.net" # This is fake allowed senders email, if sender is not in the list in will deny forward
+        ],
+        "recipients":{
+                "person@domain.signal" : "+NUMBER TO SEND TO", # Email does not have to exist or even fqdn.
+                "monitoring@example.signal" : "group.*=" # Signal group ID, get it in signal-cli backend
+        },
+        "signal":{
+                "backend" : "http://signal-backend:8080/v2/send",
+                "number" : "+REGISTERED_SIGNAL_NUMBER"
+        }
+}
