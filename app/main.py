@@ -60,7 +60,7 @@ class EmailHandler:
         numbers= []
         numbers.append(settings["recipients"][email_to])
         signal_post['recipients'] = numbers
-        signal_post['message'] = "Subject: " + email_subject + "\n----------\n" + email_subject
+        signal_post['message'] = email_subject + "\n----------\n" + email_subject
         signal_post["base64_attachments"] = []
         
         # Iterate over attachments and add to signal post json
