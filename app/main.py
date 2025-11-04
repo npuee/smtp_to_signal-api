@@ -4,10 +4,6 @@ from email import message_from_bytes
 from email.policy import default
 from aiosmtpd.controller import Controller
 from datetime import datetime
-import re
-
-print("Starting email to signal server:")
-print("Loading settings")
 
 # Load settings:
 file = open("settings.json", "r")
@@ -15,10 +11,17 @@ f = file.read()
 settings = json.loads(f)
 file.close()
 
+
+# Starting 
+print("Loading settings")
+# SMTP PORT -> default 8025, docker expose is set to this
+smtp_port = settings["smtp_port"]
 # Signal empty collection
-# Signal sender:
 signal_post = {}
 signal_post["number"] = settings["signal"]["number"]
+
+# Debug info
+print(f"Starting email to signal server on port: {smtp_port}")
 
 #
 #   Handles all email routes
@@ -60,7 +63,7 @@ class EmailHandler:
         numbers= []
         numbers.append(settings["recipients"][email_to])
         signal_post['recipients'] = numbers
-        signal_post['message'] = email_subject + "\n----------\n" + email_subject
+        signal_post['message'] = email_subject + "\n----------\n" + email_body
         signal_post["base64_attachments"] = []
         
         # Iterate over attachments and add to signal post json
@@ -88,7 +91,7 @@ class EmailHandler:
 
 #MAIN LOOP
 async def amain(loop):
-    cont = Controller(EmailHandler(), hostname='', port=8025)
+    cont = Controller(EmailHandler(), hostname='', port=smtp_port)
     cont.start()
 
 if __name__ == '__main__':
