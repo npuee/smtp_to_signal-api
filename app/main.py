@@ -4,6 +4,7 @@ from email import message_from_bytes
 from email.policy import default
 from aiosmtpd.controller import Controller
 from datetime import datetime
+import re
 
 print("Starting email to signal server:")
 print("Loading settings")
@@ -46,8 +47,8 @@ class EmailHandler:
         email_from = message['from']
         email_to = message['to']
         email_subject = message['Subject']
-
-
+        email_body = message.get_body().get_content()
+    
         #Remove name from email from
         if '<' in email_to and '>' in email_to:
             start = email_to.find('<') + 1
@@ -59,7 +60,7 @@ class EmailHandler:
         numbers= []
         numbers.append(settings["recipients"][email_to])
         signal_post['recipients'] = numbers
-        signal_post['message'] = email_subject
+        signal_post['message'] = "Subject: " + email_subject + "\n----------\n" + email_subject
         signal_post["base64_attachments"] = []
         
         # Iterate over attachments and add to signal post json
@@ -68,21 +69,20 @@ class EmailHandler:
             if len(image) > 1000:
                 base_post = "data:image/jpeg;base64," + base64.b64encode(image).decode("ascii")
                 signal_post.setdefault("base64_attachments", []).append(base_post)
-    
-
-
 
         #Send request to backend
         signal_backend_url = settings["signal"]["backend"]
         signal_response = requests.post(signal_backend_url, data=json.dumps(signal_post))
+        # In debug mode skip sending signal
+        #signal_response = "No signal sent, debug mode active"
 
         # Generic debug
         date_and_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        print(f"{date_and_time}, email from:{email_from}, to:{email_to}, with subject:{email_subject}")
+        print(f"{date_and_time}, email from:{email_from}, to:{email_to}")
+        print(signal_post['message'])
         print(f"Signal message sent to: {numbers}")
         print(f"Signal api respons: {signal_response}")
-        print(signal_response)
-
+        print("")
         print("-----------------------------------")
         return '250 Message accepted for delivery'
 
