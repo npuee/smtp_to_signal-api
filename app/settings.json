@@ -1,4 +1,5 @@
 {
+        "smtp_port" : 8025,
         "senders":[
                 "fake@email.net",
                 "cctv@fake.net" # This is fake allowed senders email, if sender is not in the list in will deny forward
