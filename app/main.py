@@ -29,14 +29,8 @@ print(f"Starting email to signal server on port: {smtp_port}")
 class EmailHandler:
     async def handle_RCPT(self, server, session, envelope, address, rcpt_options):
         # Allow only in sender list
-        if( envelope.mail_from not in settings["senders"] ):
+        if envelope.mail_from not in settings["senders"] or address not in settings["recipients"]:
             print(f"Denied email from: {envelope.mail_from}, to: {address}")
-            print("-----------------------------------")
-            return '550 not relaying to/from that domain'
-
-        # Allow only in recipients list
-        if( address not in settings["recipients"] ):
-            print(f"Denied email from: {envelope.mail_from}, to:{address} ")
             print("-----------------------------------")
             return '550 not relaying to/from that domain'
         # If all goor return OK
